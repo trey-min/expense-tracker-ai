@@ -1,5 +1,7 @@
 # ExpenseAI — Personal Finance Tracker
 
+**Live demo:** https://expense-tracker-ai-pied-gamma.vercel.app
+
 A modern, full-featured expense tracking web application built with Next.js 14, TypeScript, and Tailwind CSS.
 
 ## Features
