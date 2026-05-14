@@ -105,11 +105,11 @@ export function last6MonthsData(expenses: Expense[]): { month: string; total: nu
 }
 
 export function exportToCSV(expenses: Expense[]): void {
-  const header = ["Date", "Amount", "Category", "Description"];
+  const header = ["Date", "Category", "Amount", "Description"];
   const rows = expenses.map((e) => [
     e.date,
-    e.amount.toFixed(2),
     e.category,
+    e.amount.toFixed(2),
     `"${e.description.replace(/"/g, '""')}"`,
   ]);
   const csv = [header, ...rows].map((r) => r.join(",")).join("\n");
