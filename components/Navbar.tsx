@@ -41,7 +41,7 @@ export default function Navbar({ onExport }: Props) {
           className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-1.5 rounded-lg transition-colors"
         >
           <Download size={15} />
-          Export CSV
+          Export
         </button>
       </div>
     </header>
