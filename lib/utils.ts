@@ -104,20 +104,68 @@ export function last6MonthsData(expenses: Expense[]): { month: string; total: nu
   });
 }
 
-export function exportToCSV(expenses: Expense[]): void {
-  const header = ["Date", "Amount", "Category", "Description"];
-  const rows = expenses.map((e) => [
-    e.date,
-    e.amount.toFixed(2),
-    e.category,
-    `"${e.description.replace(/"/g, '""')}"`,
-  ]);
-  const csv = [header, ...rows].map((r) => r.join(",")).join("\n");
-  const blob = new Blob([csv], { type: "text/csv" });
+function triggerDownload(content: string, filename: string, mime: string): void {
+  const blob = new Blob([content], { type: mime });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `expenses-${format(new Date(), "yyyy-MM-dd")}.csv`;
+  a.download = filename;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+export function exportToCSV(expenses: Expense[], filename?: string): void {
+  const header = ["Date", "Category", "Amount", "Description"];
+  const rows = expenses.map((e) => [
+    e.date,
+    e.category,
+    e.amount.toFixed(2),
+    `"${e.description.replace(/"/g, '""')}"`,
+  ]);
+  const csv = [header, ...rows].map((r) => r.join(",")).join("\n");
+  const name = filename ?? `expenses-${format(new Date(), "yyyy-MM-dd")}`;
+  triggerDownload(csv, `${name}.csv`, "text/csv");
+}
+
+export function exportToJSON(expenses: Expense[], filename: string): void {
+  const data = expenses.map((e) => ({
+    date: e.date,
+    category: e.category,
+    amount: e.amount,
+    description: e.description,
+  }));
+  triggerDownload(JSON.stringify(data, null, 2), `${filename}.json`, "application/json");
+}
+
+export function exportToPDF(expenses: Expense[], filename: string): void {
+  const total = expenses.reduce((s, e) => s + e.amount, 0);
+  const rows = expenses
+    .map(
+      (e) => `<tr>
+        <td>${e.date}</td><td>${e.category}</td>
+        <td>$${e.amount.toFixed(2)}</td>
+        <td>${e.description.replace(/</g, "&lt;")}</td>
+      </tr>`
+    )
+    .join("");
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${filename}</title>
+<style>
+  body{font-family:system-ui,sans-serif;color:#111827;padding:40px;font-size:13px}
+  h1{font-size:18px;margin:0 0 4px}
+  .meta{color:#6b7280;margin:0 0 24px}
+  table{width:100%;border-collapse:collapse}
+  th{background:#f3f4f6;text-align:left;padding:8px 12px;font-weight:600;border-bottom:2px solid #e5e7eb}
+  td{padding:8px 12px;border-bottom:1px solid #f3f4f6}
+  .footer{margin-top:16px;text-align:right}
+  @media print{body{padding:20px}}
+</style></head><body>
+  <h1>Expense Report</h1>
+  <p class="meta">${filename} &middot; ${expenses.length} record${expenses.length !== 1 ? "s" : ""} &middot; ${new Date().toLocaleDateString()}</p>
+  <table><thead><tr><th>Date</th><th>Category</th><th>Amount</th><th>Description</th></tr></thead>
+  <tbody>${rows}</tbody></table>
+  <div class="footer">Total: <strong>$${total.toFixed(2)}</strong></div>
+  <script>window.onload=()=>{window.print()}</script>
+</body></html>`;
+  const win = window.open("", "_blank");
+  if (win) { win.document.write(html); win.document.close(); }
 }

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, List, Download } from "lucide-react";
+import { LayoutDashboard, List, CloudUpload } from "lucide-react";
 
 interface Props {
   onExport: () => void;
@@ -38,10 +38,10 @@ export default function Navbar({ onExport }: Props) {
         </div>
         <button
           onClick={onExport}
-          className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-1.5 rounded-lg transition-colors"
+          className="flex items-center gap-1.5 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 px-3 py-1.5 rounded-lg transition-colors shadow-sm shadow-indigo-200"
         >
-          <Download size={15} />
-          Export CSV
+          <CloudUpload size={15} />
+          Export Hub
         </button>
       </div>
     </header>

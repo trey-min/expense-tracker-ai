@@ -3,23 +3,24 @@
 import { useState } from "react";
 import { Expense } from "@/lib/types";
 import { useExpenses } from "@/hooks/useExpenses";
-import { exportToCSV } from "@/lib/utils";
 import Navbar from "@/components/Navbar";
 import SummaryCards from "@/components/SummaryCards";
 import Charts from "@/components/Charts";
 import ExpenseForm from "@/components/ExpenseForm";
 import ExpenseList from "@/components/ExpenseList";
+import ExportHub from "@/components/ExportHub";
 import { Plus, X } from "lucide-react";
 
 export default function DashboardClient() {
   const { expenses, loaded, addExpense, updateExpense, deleteExpense } = useExpenses();
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showExportHub, setShowExportHub] = useState(false);
 
   if (!loaded) {
     return (
       <>
-        <Navbar onExport={() => {}} />
+        <Navbar onExport={() => setShowExportHub(true)} />
         <main className="max-w-5xl mx-auto px-4 py-6 flex items-center justify-center min-h-[50vh]">
           <div className="flex flex-col items-center gap-3 text-gray-400">
             <div className="w-8 h-8 border-2 border-indigo-300 border-t-indigo-600 rounded-full animate-spin" />
@@ -32,7 +33,7 @@ export default function DashboardClient() {
 
   return (
     <>
-      <Navbar onExport={() => exportToCSV(expenses)} />
+      <Navbar onExport={() => setShowExportHub(true)} />
       <main className="max-w-5xl mx-auto px-4 py-6 space-y-6">
         {/* Page title */}
         <div className="flex items-center justify-between">
@@ -95,6 +96,12 @@ export default function DashboardClient() {
           />
         </div>
       </main>
+
+      <ExportHub
+        expenses={expenses}
+        isOpen={showExportHub}
+        onClose={() => setShowExportHub(false)}
+      />
     </>
   );
 }
